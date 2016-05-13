@@ -12,7 +12,7 @@ LOGGER = logging.getLogger(__name__)
 class HAProxy(base.CSVStatsPlugin):
 
     DEFAULT_PATH = 'haproxy?stats;csv'
-    GUID = 'com.meetme.newrelic_haproxy_agent'
+    GUID = 'com.dell.software.newrelic_haproxy_agent'
     UNIT = {'Queue': {'Current': 'connections', 'Max': 'connections'},
             'Sessions': {'Current': 'sessions', 'Max': 'sessions',
                          'Total': 'sessions'},

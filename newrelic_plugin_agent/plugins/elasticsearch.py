@@ -20,7 +20,7 @@ class ElasticSearch(base.JSONStatsPlugin):
     DEFAULT_HOST = 'localhost'
     DEFAULT_PATH = '/_nodes/stats?all'
     DEFAULT_PORT = 9200
-    GUID = 'com.meetme.newrelic_elasticsearch_node_agent'
+    GUID = 'com.dell.software.newrelic_elasticsearch_node_agent'
 
     STATUS_CODE = {'green': 0, 'yellow': 1, 'red': 2}
 

@@ -13,7 +13,7 @@ LOGGER = logging.getLogger(__name__)
 
 class RabbitMQ(base.Plugin):
 
-    GUID = 'com.meetme.newrelic_rabbitmq_agent'
+    GUID = 'com.dell.software.newrelic_rabbitmq_agent'
 
     DEFAULT_USER = 'guest'
     DEFAULT_PASSWORD = 'guest'

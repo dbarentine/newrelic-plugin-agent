@@ -79,7 +79,7 @@ LOCK_MAP = {'AccessExclusiveLock': 'Locks/Access Exclusive',
 
 class PostgreSQL(base.Plugin):
 
-    GUID = 'com.meetme.newrelic_postgresql_agent'
+    GUID = 'com.dell.software.newrelic_postgresql_agent'
 
     def add_stats(self, cursor):
         self.add_backend_stats(cursor)

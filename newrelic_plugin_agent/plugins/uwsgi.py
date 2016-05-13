@@ -13,7 +13,7 @@ LOGGER = logging.getLogger(__name__)
 
 class uWSGI(base.SocketStatsPlugin):
 
-    GUID = 'com.meetme.newrelic_uwsgi_agent'
+    GUID = 'com.dell.software.newrelic_uwsgi_agent'
 
     DEFAULT_HOST = 'localhost'
     DEFAULT_PORT = 1717
