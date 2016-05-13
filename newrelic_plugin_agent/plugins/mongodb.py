@@ -117,6 +117,16 @@ class MongoDB(base.Plugin):
         self.add_derive_value('Operations/Command', 'ops',
                               ops.get('command', 0))
 
+        ops = stats.get('opcountersRepl', dict())
+        self.add_derive_value('Replication Operations/Insert', 'ops', ops.get('insert', 0))
+        self.add_derive_value('Replication Operations/Query', 'ops', ops.get('query', 0))
+        self.add_derive_value('Replication Operations/Update', 'ops', ops.get('update', 0))
+        self.add_derive_value('Replication Replication Operations/Delete', 'ops', ops.get('delete', 0))
+        self.add_derive_value('Operations/Get More', 'ops',
+                              ops.get('getmore', 0))
+        self.add_derive_value('Replication Operations/Command', 'ops',
+                              ops.get('command', 0))
+
         extra = stats.get('extra_info', dict())
         self.add_gauge_value('System/Heap Usage', 'bytes',
                              extra.get('heap_usage_bytes', 0))
