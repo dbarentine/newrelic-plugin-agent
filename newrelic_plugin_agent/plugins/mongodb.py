@@ -25,11 +25,11 @@ class MongoDB(base.Plugin):
         """
         base_key = 'Database/%s' % name
         self.add_gauge_value('%s/Extents' % base_key, 'extents',
-                             stats.get('extents', 0))
+                             stats.get('numExtents', 0))
         self.add_gauge_value('%s/Size' % base_key, 'bytes',
                              stats.get('dataSize', 0) / 1048576)
-        self.add_gauge_value('%s/File Size' % base_key, 'bytes',
-                             stats.get('fileSize', 0) / 1048576)
+        self.add_gauge_value('%s/Storage Size' % base_key, 'bytes',
+                             stats.get('storageSize', 0) / 1048576)
         self.add_gauge_value('%s/Objects' % base_key, 'objects',
                              stats.get('objects', 0))
         self.add_gauge_value('%s/Collections' % base_key, 'collections',
@@ -57,18 +57,6 @@ class MongoDB(base.Plugin):
         self.add_derive_value('Asserts/Rollovers', 'asserts',
                               asserts.get('rollovers', 0))
 
-        flush = stats.get('backgroundFlushing', dict())
-        self.add_derive_timing_value('Background Flushes',
-                                     'ms',
-                                     flush.get('flushes', 0),
-                                     flush.get('total_ms', 0),
-                                     flush.get('last_ms', 0))
-        self.add_gauge_value('Seconds since last flush',
-                             'seconds',
-                             (datetime.datetime.now() -
-                              flush.get('last_finished',
-                                        datetime.datetime.now())).seconds)
-
         conn = stats.get('connections', dict())
         self.add_gauge_value('Connections/Available', 'connections',
                              conn.get('available', 0))
@@ -81,35 +69,9 @@ class MongoDB(base.Plugin):
         self.add_derive_value('Cursors/Timed Out', 'cursors',
                               cursors.get('timedOut', 0))
 
-        dur = stats.get('dur', dict())
-        self.add_gauge_value('Durability/Commits in Write Lock', 'commits',
-                             dur.get('commitsInWriteLock', 0))
-        self.add_gauge_value('Durability/Early Commits', 'commits',
-                             dur.get('earlyCommits', 0))
-        self.add_gauge_value('Durability/Journal Commits', 'commits',
-                             dur.get('commits', 0))
-        self.add_gauge_value('Durability/Journal Bytes Written', 'bytes',
-                             dur.get('journaledMB', 0) / 1048576)
-        self.add_gauge_value('Durability/Data File Bytes Written', 'bytes',
-                             dur.get('writeToDataFilesMB', 0) / 1048576)
-
-        timems = dur.get('timeMs', dict())
-        self.add_gauge_value('Durability/Timings/Duration Measured', 'ms',
-                             timems.get('dt', 0))
-        self.add_gauge_value('Durability/Timings/Log Buffer Preparation', 'ms',
-                             timems.get('prepLogBuffer', 0))
-        self.add_gauge_value('Durability/Timings/Write to Journal', 'ms',
-                             timems.get('writeToJournal', 0))
-        self.add_gauge_value('Durability/Timings/Write to Data Files', 'ms',
-                             timems.get('writeToDataFiles', 0))
-        self.add_gauge_value('Durability/Timings/Remaping Private View', 'ms',
-                             timems.get('remapPrivateView', 0))
-
         locks = stats.get('globalLock', dict())
         self.add_derive_value('Global Locks/Held', 'ms',
-                              locks.get('lockTime', 0) / 1000)
-        self.add_derive_value('Global Locks/Ratio', 'ratio',
-                              locks.get('ratio', 0))
+                              locks.get('totalTime', 0) / 1000)
 
         active = locks.get('activeClients', dict())
         self.add_derive_value('Global Locks/Active Clients/Total', 'clients',
@@ -126,21 +88,6 @@ class MongoDB(base.Plugin):
                               queue.get('readers', 0))
         self.add_derive_value('Global Locks/Queue/Writers', 'writers',
                               queue.get('writers', 0))
-
-        index = stats.get('indexCounters', dict())
-        btree_index = index.get('btree', dict())
-        self.add_derive_value('Index/Accesses', 'accesses',
-                              index.get('accesses', 0) +
-                              btree_index.get('accesses', 0))
-        self.add_derive_value('Index/Hits', 'hits',
-                              index.get('hits', 0) +
-                              btree_index.get('hits', 0))
-        self.add_derive_value('Index/Misses', 'misses',
-                              index.get('misses', 0) +
-                              btree_index.get('misses', 0))
-        self.add_derive_value('Index/Resets', 'resets',
-                              index.get('resets', 0) +
-                              btree_index.get('resets', 0))
 
         mem = stats.get('mem', dict())
         self.add_gauge_value('Memory/Mapped', 'bytes',
@@ -217,6 +164,8 @@ class MongoDB(base.Plugin):
             except errors.OperationFailure as error:
                 LOGGER.critical('Could not fetch stats: %s', error)
 
+		client.close()
+
     def get_and_add_db_dict(self, databases):
         """Handle the nested database structure with username and password.
 
@@ -239,6 +188,8 @@ class MongoDB(base.Plugin):
                     db.logout()
             except errors.OperationFailure as error:
                 LOGGER.critical('Could not fetch stats: %s', error)
+
+		client.close()
 
     def get_and_add_server_stats(self):
         LOGGER.debug('Fetching server stats')
