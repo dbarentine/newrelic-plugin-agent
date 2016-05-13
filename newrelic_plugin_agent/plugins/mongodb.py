@@ -30,8 +30,10 @@ class MongoDB(base.Plugin):
                              stats.get('dataSize', 0))
         self.add_gauge_value('%s/Storage Size' % base_key, 'bytes',
                              stats.get('storageSize', 0))
-        self.add_gauge_value('%s/Objects' % base_key, 'objects',
+        self.add_gauge_value('%s/Objects/Count' % base_key, 'objects',
                              stats.get('objects', 0))
+        self.add_gauge_value('%s/Objects/Average Size' % base_key, 'bytes',
+                             stats.get('avgObjectSize', 0))
         self.add_gauge_value('%s/Collections' % base_key, 'collections',
                              stats.get('collections', 0))
         self.add_gauge_value('%s/Index/Count' % base_key, 'indexes',
